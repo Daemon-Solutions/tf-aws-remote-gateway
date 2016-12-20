@@ -4,12 +4,6 @@ variable "envname" {}
 
 variable "envtype" {}
 
-#variable "aws_region" {}
-
-#variable "vpc_id" {}
-
-#variable "vpc_cidr" {}
-
 variable "public_subnets" {
   description = "A list of public subnets inside the VPC."
   default     = []
