@@ -11,7 +11,7 @@ data "template_file" "rdgw_userdata" {
   template = "${var.rdgw_userdata}"
 
   vars {
-    region          = "${var.aws_region}"
+    region          = "${data.aws_region.current.name}"
     dns_servers     = "${element(var.ads_dns,0)},${element(var.ads_dns,1)}"
     local_password  = "${var.local_password}"
     domain_password = "${var.domain_password}"

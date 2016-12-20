@@ -7,3 +7,12 @@ data "aws_ami" "windows" {
    values = ["${lookup(var.windows_ami_names,var.windows_ver)}"]
     }
  }
+
+data "aws_subnet" "vpc" {
+  id = "${var.public_subnets}"
+  cidr_block = "${var.public_subnets}"
+}
+
+ data "aws_region" "current" {
+   current = true
+}
