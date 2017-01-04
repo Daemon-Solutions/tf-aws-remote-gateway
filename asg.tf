@@ -11,6 +11,7 @@ data "template_file" "rdgw_userdata" {
   template = "${file("./include/userdata.tmpl")}"
 
   vars {
+    
     region          = "${data.aws_region.current.current}"
     dns_servers     = "${element(var.ads_dns,0)},${element(var.ads_dns,1)}"
     local_password  = "${var.local_password}"
