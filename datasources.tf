@@ -9,8 +9,7 @@ data "aws_ami" "windows" {
  }
 
 data "aws_subnet" "vpc" {
-  id = "${var.public_subnets}"
-  cidr_block = "${var.public_subnets}"
+  id = "${element(var.public_subnets,0)}"
 }
 
  data "aws_region" "current" {
