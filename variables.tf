@@ -4,12 +4,6 @@ variable "envname" {}
 
 variable "envtype" {}
 
-variable "aws_region" {}
-
-variable "vpc_id" {}
-
-variable "vpc_cidr" {}
-
 variable "public_subnets" {
   description = "A list of public subnets inside the VPC."
   default     = []
@@ -22,6 +16,7 @@ variable "private_subnets" {
 
 variable "azs" {
   type = "list"
+  default = ["eu-west-1a","eu-west-1b","eu-west-1c"]
 }
 
 variable "domain_name" {}
@@ -40,13 +35,13 @@ variable "ads_dns" {
   type = "list"
 }
 
-variable "ads_id" {}
-
 variable "ads_sg" {}
 
 ## Userdata Variables
 
-variable "rdgw_userdata" {}
+variable "rdgw_userdata" {
+  default = ""
+}
 
 variable "local_password" {}
 
@@ -56,13 +51,17 @@ variable "windows_ami_names" {
   default = {
     "2008" = "Windows_Server-2008-R2_SP1-English-64Bit-Base-*",
     "2012" = "Windows_Server-2012-R2_RTM-English-64Bit-Base-*",
-    "2016"  = "Windows_Server-2016-English-Full-Base*"
+    "2016" = "Windows_Server-2016-English-Full-Base*"
   }
 }
 
-variable "windows_ver" {}
+variable "windows_ver" {
+  default = "2016"
+}
 
-variable "instance_type" {}
+variable "instance_type" {
+  default = "t2.medium"
+}
 
 variable "key_name" {}
 

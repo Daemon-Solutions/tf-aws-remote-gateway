@@ -88,3 +88,34 @@ resource "aws_iam_role_policy" "s3_readonly" {
 }
 EOF
 }
+
+resource "aws_iam_role_policy" "ssm_activation" {
+  name = "${var.customer}-${var.envname}-rdgw-ssm-activation"
+
+  role = "${aws_iam_role.rdgw_role.id}"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+                "ssm:CreateAssociation",
+                "ssm:DescribeAssociation",
+                "ssm:GetDeployablePatchSnapshotForInstance",
+                "ssm:GetDocument",
+                "ssm:GetParameters",
+                "ssm:ListAssociations",
+                "ssm:ListInstanceAssociations",
+                "ssm:PutInventory",
+                "ssm:UpdateAssociationStatus",
+                "ssm:UpdateInstanceAssociationStatus",
+                "ssm:UpdateInstanceInformation"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
