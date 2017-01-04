@@ -100,6 +100,7 @@ resource "aws_iam_role_policy" "ssm_activation" {
   "Statement": [
     {
       "Action": [
+                "ssm:CreateAssociation",
                 "ssm:DescribeAssociation",
                 "ssm:GetDeployablePatchSnapshotForInstance",
                 "ssm:GetDocument",
