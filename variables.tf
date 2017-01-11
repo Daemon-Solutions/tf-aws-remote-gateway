@@ -4,6 +4,10 @@ variable "envname" {}
 
 variable "envtype" {}
 
+variable "service" {
+  default = "rdgw"
+}
+
 variable "public_subnets" {
   description = "A list of public subnets inside the VPC."
   default     = []
@@ -65,20 +69,6 @@ variable "instance_type" {
 
 variable "key_name" {}
 
-
-variable "detailed_monitoring" {
-  default = false
-}
-
-## Auto-Scaling Group
-variable "health_check_type" {
-  default = "EC2"
-}
-
-variable "health_check_grace_period" {
-  default = 300
-}
-
 ## Security Groups Variables
 #
 # - 195.102.251.16/28 -- LinuxIT Bristol
@@ -88,4 +78,23 @@ variable "health_check_grace_period" {
 #
 variable "rdgw_ssh_cidrs" {
   default = ["88.97.72.136/32", "54.76.122.23/32", "195.102.251.16/28", "195.8.68.130/32"]
+}
+
+## elb vars
+
+variable "elb_aws_account" {
+  default = {
+    us-east-1      = "127311923021"
+    us-west-2      = "797873946194"
+    us-west-1      = "027434742980"
+    eu-west-1      = "156460612806"
+    eu-central-1   = "054676820928"
+    ap-southeast-1 = "114774131450"
+    ap-northeast-1 = "582318560864"
+    ap-southeast-2 = "783225319266"
+    ap-northeast-2 = "600734575887"
+    sa-east-1      = "507241528517"
+    us-gov-west-1  = "048591011584"
+    cn-north-1     = "638102146993"
+  }
 }

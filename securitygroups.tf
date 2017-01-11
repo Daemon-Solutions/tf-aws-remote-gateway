@@ -5,29 +5,20 @@ resource "aws_security_group" "rdgw_external" {
   description = "rdgw security group"
 
   ingress {
-    from_port   = "3389"
-    to_port     = "3389"
+    from_port   = "80"
+    to_port     = "80"
     protocol    = "tcp"
     cidr_blocks = ["${var.rdgw_ssh_cidrs}"]
   }
-  ingress {
-    from_port   = "5985"
-    to_port     = "5985"
-    protocol    = "tcp"
-    cidr_blocks = ["${var.rdgw_ssh_cidrs}"]
-  }
-  ingress {
-    from_port   = "5986"
-    to_port     = "5986"
-    protocol    = "tcp"
-    cidr_blocks = ["${var.rdgw_ssh_cidrs}"]
-  }
-  ingress {
-    from_port = "443"
-    to_port = "443"
-    protocol = "tcp"
-    cidr_blocks = ["${var.rdgw_ssh_cidrs}"]
-  }
+}
+
+resource "aws_security_group_rule" "rdgw" {
+  type = "egress"
+  protocol = "tcp"
+  from_port = "80"
+  to_port = "80"
+  security_group_id = "${aws_security_group.rdgw_external.id}"
+  source_security_group_id  = "${aws_security_group.rdgw_internal.id}"
 }
 
 ## Internal Security Group
@@ -40,13 +31,15 @@ resource "aws_security_group" "rdgw_internal" {
     from_port   = "3389"
     to_port     = "3389"
     protocol    = "tcp"
-    cidr_blocks = ["${data.aws_subnet.vpc.cidr_block}"]
+    cidr_blocks = ["${data.aws_vpc.cidr.cidr_block}"]
     }
+}
 
-  egress {
-    from_port = "443"
-    to_port = "443"
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_security_group_rule" "rdgw_internal" {
+  type = "ingress"
+  from_port = "80"
+  to_port = "80"
+  protocol = "tcp"
+  security_group_id = "${aws_security_group.rdgw_internal.id}"
+  source_security_group_id  = "${aws_security_group.rdgw_external.id}"
 }
