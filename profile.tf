@@ -1,7 +1,7 @@
 
 
 module "iam_instance_profile" {
-  source = "../bashton-windows/aws/terraform/localmodules/tf-aws-iam-instance-profile"
+  source = "../tf-aws-iam-instance-profile"
 
   name         = "${var.customer}"
   ec2_describe = "1"
