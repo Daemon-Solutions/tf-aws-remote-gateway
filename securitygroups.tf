@@ -33,6 +33,13 @@ resource "aws_security_group" "rdgw_internal" {
     protocol    = "tcp"
     cidr_blocks = ["${data.aws_vpc.cidr.cidr_block}"]
     }
+
+  egress {
+   from_port = "443"
+   to_port = "443"
+   protocol = "tcp"
+   cidr_blocks = ["0.0.0.0/0"]
+    }
 }
 
 resource "aws_security_group_rule" "rdgw_internal" {

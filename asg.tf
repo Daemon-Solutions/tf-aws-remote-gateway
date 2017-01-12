@@ -7,7 +7,7 @@ data "template_file" "rdgw_userdata" {
   vars {
 
     region          = "${data.aws_region.current.name}"
-    ad_user         = "${var.ad_user}"
+    ad_user         = "${lookup(var.admin_users,var.ad_type)}"
     dns_servers     = "${element(var.ads_dns,0)},${element(var.ads_dns,1)}"
     local_password  = "${var.local_password}"
     domain_password = "${var.domain_password}"
