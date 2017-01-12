@@ -45,7 +45,7 @@ variable "ads_dns" {
 
 variable "ads_sg" {}
 
-variable "ad_user" {}
+#variable "ad_user" {}
 
 ## Userdata Variables
 
@@ -104,3 +104,12 @@ variable "elb_aws_account" {
     cn-north-1     = "638102146993"
   }
 }
+
+variable "admin_users" {
+  default = {
+    "SimpleAD"    = "administrator",
+    "MicrosoftAD" = "admin"
+  }
+}
+
+variable "ad_type" {}
