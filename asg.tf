@@ -44,7 +44,7 @@ resource "aws_route53_record" "elb" {
 
   alias {
     name = "${aws_elb.elb.dns_name}"
-    zone_id = "${var.route53_zone_id}"
+    zone_id = "${aws_elb.elb.zone_id}"
     evaluate_target_health = false
   }
 }
