@@ -38,13 +38,13 @@ module "asg" {
 // Route53 Record
 resource "aws_route53_record" "elb" {
   count = "1"
-  zone_id = "${data.aws_route53_zone.domain.zone_id}"
-  name = "${var.service}.${data.aws_route53_zone.domain.name}"
+  zone_id = "${var.route53_zone_id}"
+  name = "${var.service}.${var.route53_zone_name}"
   type = "A"
 
   alias {
     name = "${aws_elb.elb.dns_name}"
-    zone_id = "${aws_elb.elb.zone_id}"
+    zone_id = "${var.route53_zone_name}"
     evaluate_target_health = false
   }
 }
