@@ -25,6 +25,10 @@ variable "azs" {
 
 variable "domain_name" {}
 
+variable "route53_zone_id" {}
+
+variable "route53_zone_name" {}
+
 ## IAM profile
 
 variable "profile" {
@@ -40,6 +44,8 @@ variable "ads_dns" {
 }
 
 variable "ads_sg" {}
+
+variable "ad_user" {}
 
 ## Userdata Variables
 

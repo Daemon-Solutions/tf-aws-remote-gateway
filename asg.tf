@@ -7,6 +7,7 @@ data "template_file" "rdgw_userdata" {
   vars {
 
     region          = "${data.aws_region.current.name}"
+    ad_user         = "${var.ad_user}"
     dns_servers     = "${element(var.ads_dns,0)},${element(var.ads_dns,1)}"
     local_password  = "${var.local_password}"
     domain_password = "${var.domain_password}"
@@ -25,7 +26,7 @@ module "asg" {
   instance_type         = "${var.instance_type}"
   iam_instance_profile  = "${module.iam_instance_profile.profile_id}"
   key_name              = "${var.key_name}"
-  security_groups       = ["${aws_security_group.rdgw_internal.id}","${var.ads_sg}","${aws_security_group.rdgw_external.id}"]
+  security_groups       = ["${aws_security_group.rdgw_internal.id}","${var.ads_sg}"]
   user_data             = "<powershell>${data.template_file.rdgw_userdata.rendered}</powershell><persist>true</persist>"
 
   subnets               = "${var.public_subnets}"
