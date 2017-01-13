@@ -3,7 +3,7 @@
 module "iam_instance_profile" {
   source = "../tf-aws-iam-instance-profile"
 
-  name         = "${var.customer}"
+  name         = "${var.customer}-${var.service}"
   ec2_describe = "1"
   ec2_attach   = "1"
   s3_readonly  = "1"

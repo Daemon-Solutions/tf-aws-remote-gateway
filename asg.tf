@@ -18,7 +18,7 @@ data "template_file" "rdgw_userdata" {
 module "asg" {
   source = "../tf-aws-asg"
 
-  name                  = "${var.customer}"
+  name                  = "${var.customer}-${var.service}"
   envname               = "${var.envname}"
   service               = "${var.envtype}"
 
