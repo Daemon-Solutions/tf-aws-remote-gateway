@@ -31,3 +31,6 @@ if ( ([string]::Compare($newName, $env:computerName, $True) -ne 0) ) {
 	Set-DnsClientServerAddress -InterfaceAlias $alias -ServerAddress "${dns_servers}"
 	ConnectToDomain
 }
+
+Install-windowsfeature -Name rds-gateway -IncludeAllSubFeature
+Install-WindowsFeature -Name rsat-rds-gateway -IncludeAllSubFeature
