@@ -89,17 +89,18 @@ resource "aws_elb" "elb" {
   }
 
   listener {
-    instance_port = "80"
-    instance_protocol = "tcp"
-    lb_port = "80"
-    lb_protocol = "tcp"
+    instance_port = "443"
+    instance_protocol = "https"
+    lb_port = "443"
+    lb_protocol = "https"
+    ssl_certificate_id = "${data.aws_iam_server_certificate.domain.arn}"
   }
 
   health_check {
     healthy_threshold = 2
     unhealthy_threshold = 2
     timeout = 3
-    target = "HTTP:80/"
+    target = "TCP:443"
     interval = 30
   }
 

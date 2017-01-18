@@ -20,3 +20,8 @@ data "aws_subnet" "vpc" {
  data "aws_region" "current" {
    current = true
 }
+
+data "aws_iam_server_certificate" "domain" {
+  name_prefix = "ao_cert"
+  latest = true
+}
