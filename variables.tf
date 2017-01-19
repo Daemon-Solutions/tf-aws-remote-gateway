@@ -111,3 +111,5 @@ variable "elb_aws_account" {
     cn-north-1     = "638102146993"
   }
 }
+
+variable "ssl_cert" {}
