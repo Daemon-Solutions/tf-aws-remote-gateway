@@ -93,7 +93,7 @@ resource "aws_elb" "elb" {
     instance_protocol = "https"
     lb_port = "443"
     lb_protocol = "https"
-    ssl_certificate_id = "${data.aws_iam_server_certificate.domain.arn}"
+    ssl_certificate_id = "${var.ssl_cert}"
   }
 
   health_check {
