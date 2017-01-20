@@ -12,16 +12,10 @@ data "aws_ami" "windows" {
    id = "${data.aws_subnet.vpc.vpc_id}"
  }
 
-
 data "aws_subnet" "vpc" {
   id = "${element(var.public_subnets,0)}"
 }
 
  data "aws_region" "current" {
    current = true
-}
-
-data "aws_iam_server_certificate" "domain" {
-  name_prefix = "ao_cert"
-  latest = true
 }
