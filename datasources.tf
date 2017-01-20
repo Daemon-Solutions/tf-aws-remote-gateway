@@ -12,7 +12,6 @@ data "aws_ami" "windows" {
    id = "${data.aws_subnet.vpc.vpc_id}"
  }
 
-
 data "aws_subnet" "vpc" {
   id = "${element(var.public_subnets,0)}"
 }
