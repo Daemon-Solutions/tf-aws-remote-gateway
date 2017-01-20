@@ -1,7 +1,3 @@
-## Userdata Ouputs
-output "rdgw_userdata_rendered" {
-  value = "${data.template_file.rdgw_userdata.rendered}"
-}
 
 ## IAM Outputs
 output "rdgw_iam_profile_id" {
