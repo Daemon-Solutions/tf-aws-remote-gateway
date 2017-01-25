@@ -22,7 +22,3 @@ output "asg_name" {
 output "rdgw_external_sg_id" {
   value = "${aws_security_group.rdgw_external.id}"
 }
-
-output "rdgw_internal_sg_id" {
-  value = "${aws_security_group.rdgw_internal.id}"
-}
