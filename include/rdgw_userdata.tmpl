@@ -1,0 +1,91 @@
+function ConnectToDomain() {
+	$domain = (Get-WmiObject -Class Win32_ComputerSystem).Domain
+	$newDomain = "${domain_name}"
+	$ad_user = "${ad_user}"
+	$newDomainPassword = '${domain_password}' # single quotes because password can contain dollar sign
+	if ( ([string]::Compare($newDomain, $domain, $True) -ne 0) ) {
+	  $connect = (Get-WmiObject -Class Win32_ComputerSystem).JoinDomainOrWorkGroup($newDomain,$newDomainPassword,"$ad_user@$newDomain",$null,3).ReturnValue
+	  if ($connect -eq 0 ) {
+			Restart-Computer
+			Start-Sleep -s 30
+	  }
+	}
+}
+
+net user administrator ${local_password}
+$azs = (Invoke-RestMethod -Method Get -Uri http://169.254.169.254/latest/meta-data/placement/availability-zone).Trim()
+$az = $azs.substring($azs.length -1,1)
+
+if ( $az -eq "a") { $newname = "rdgw1" }
+
+if ( $az -eq "b") { $newname = "rdgw2" }
+
+if ( $az -eq "c") { $newname = "rdgw3" }
+
+if ( ([string]::Compare($newName, $env:computerName, $True) -ne 0) ) {
+	$rename = (Get-WmiObject -Class Win32_ComputerSystem).Rename($newName,"${local_password}",'Administrator').ReturnValue
+  if ($rename -eq 0) {
+    Restart-Computer
+    Start-Sleep -s 30
+  }
+
+	} else {
+
+	Set-DefaultAWSRegion -Region "${region}"
+  start-sleep -s 30
+	Import-Module NetAdapter
+	$alias = (Get-NetAdapter).Name
+	Set-DnsClientServerAddress -InterfaceAlias $alias -ServerAddress "${dns_servers}"
+	ConnectToDomain
+}
+
+$domain_name = "${domain_name}"
+
+copy-S3Object -BucketName bowser-james-nonprod-tfstate -Key team-bowser.pfx -LocalFile c:\team-bowser.pfx
+
+$certpwd = ConvertTo-SecureString "V#eXNSsvqEI3" -AsPlainText -Force
+Import-PfxCertificate -CertStoreLocation Cert:\LocalMachine\my -Password $certpwd -FilePath c:\team-bowser.pfx
+
+$thumb = (gci -path cert:/LocalMachine/My | select -first 1).Thumbprint
+
+if ((get-windowsfeature -name rds-gateway).installstate -eq "Installed") {
+  write-host "Role already installed"}
+  else {
+    Add-windowsfeature -Name RDS-gateway -IncludeManagementtools –IncludeAllSubFeature
+  }
+
+if ((get-windowsfeature -name RDS-RD-Server).installstate -eq "Installed") {
+    write-host "Role already installed"}
+    else {
+      Add-windowsfeature -Name RDS-RD-Server -IncludeManagementtools
+      sleep -seconds 30
+      restart-computer
+    }
+
+Import-module -name remotedesktopservices
+
+set-item -Path "RDS:\GatewayServer\SSLCertificate\Thumbprint" $thumb
+
+new-item -path RDS:\GatewayServer\CAP -Name Default-CAP -UserGroups "domain admins@$domain_name" -AuthMethod 1
+
+new-item -Path RDS:\GatewayServer\RAP -Name Default-RAP -UserGroups "domain admins@$domain_name" -ComputerGroupType 2
+
+iisreset
+
+$ipAddress = (Invoke-RestMethod -Method Get -Uri http://169.254.169.254/latest/meta-data/public-ipv4)
+$route53_zone_id = "${route53_zone_id}"
+$HostName = "$env:COMPUTERNAME.team-bowser.com"
+$record = new-object Amazon.Route53.Model.ResourceRecord
+$record.Value = $ipAddress
+
+$rs = New-Object Amazon.Route53.Model.ResourceRecordSet
+$rs.Name = $HostName
+$rs.Type = "A"
+$rs.TTL = "10"
+$rs.ResourceRecords = $record
+
+$change = new-object Amazon.Route53.Model.Change
+$change.Action = 'UPSERT'
+$change.ResourceRecordSet = $rs
+
+Edit-R53ResourceRecordSet -HostedZoneId $route53_zone_id -ChangeBatch_Change $change

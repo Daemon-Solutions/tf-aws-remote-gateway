@@ -23,7 +23,12 @@ variable "azs" {
   default = ["eu-west-1a","eu-west-1b","eu-west-1c"]
 }
 
+variable "aws_region" {
+  default = "eu-west-1"
+}
 variable "domain_name" {}
+
+variable "route53_zone_id" {}
 
 ## IAM profile
 
@@ -49,12 +54,6 @@ variable "admin_users" {
 }
 
 variable "ad_type" {}
-
-## Userdata Variables
-
-variable "domain_connect_userdata" {
-  default = ""
-}
 
 variable "local_password" {}
 
