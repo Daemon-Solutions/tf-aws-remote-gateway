@@ -41,10 +41,17 @@ if ( ([string]::Compare($newName, $env:computerName, $True) -ne 0) ) {
 
 $domain_name = "${domain_name}"
 
-copy-S3Object -BucketName bowser-james-nonprod-tfstate -Key team-bowser.pfx -LocalFile c:\team-bowser.pfx
+$bucketname = "${certificate_bucket_id}"
+$bucketobject = "${certificate_object_id}"
+$ssmparam	= "${ssm_param_value}"
 
-$certpwd = ConvertTo-SecureString "V#eXNSsvqEI3" -AsPlainText -Force
-Import-PfxCertificate -CertStoreLocation Cert:\LocalMachine\my -Password $certpwd -FilePath c:\team-bowser.pfx
+$certificate_password = (Get-SSMParameterValue -Name $ssmparam -WithDecryption $true).Parameters.value
+
+$certstore = "c:\cert.pfx"
+copy-S3Object -BucketName $bucketname -Key $bucketobject -LocalFile $certstore
+
+$certpwd = ConvertTo-SecureString $certificate_password -AsPlainText -Force
+Import-PfxCertificate -CertStoreLocation Cert:\LocalMachine\my -Password $certpwd -FilePath $certstore
 
 $thumb = (gci -path cert:/LocalMachine/My | select -first 1).Thumbprint
 
@@ -74,7 +81,7 @@ iisreset
 
 $ipAddress = (Invoke-RestMethod -Method Get -Uri http://169.254.169.254/latest/meta-data/public-ipv4)
 $route53_zone_id = "${route53_zone_id}"
-$HostName = "$env:COMPUTERNAME.team-bowser.com"
+$HostName = "$env:COMPUTERNAME.$domain_name"
 $record = new-object Amazon.Route53.Model.ResourceRecord
 $record.Value = $ipAddress
 
