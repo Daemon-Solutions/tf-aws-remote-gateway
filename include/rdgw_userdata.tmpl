@@ -61,11 +61,11 @@ if ((get-windowsfeature -name rds-gateway).installstate -eq "Installed") {
     Add-windowsfeature -Name RDS-gateway -IncludeManagementtools –IncludeAllSubFeature
   }
 
-if ((get-windowsfeature -name RDS-RD-Server).installstate -eq "Installed") {
+if ((get-windowsfeature -name RSAT-RDS-Tools).installstate -eq "Installed") {
     write-host "Role already installed"}
     else {
-      Add-windowsfeature -Name RDS-RD-Server -IncludeManagementtools
-      sleep -seconds 30
+      Add-windowsfeature -Name RSAT-RDS-Tools
+		  sleep -seconds 30
       restart-computer
     }
 
@@ -78,6 +78,24 @@ new-item -path RDS:\GatewayServer\CAP -Name Default-CAP -UserGroups "domain admi
 new-item -Path RDS:\GatewayServer\RAP -Name Default-RAP -UserGroups "domain admins@$domain_name" -ComputerGroupType 2
 
 iisreset
+
+function Disable-InternetExplorerESC {
+   $AdminKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"
+   $UserKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}"
+   Set-ItemProperty -Path $AdminKey -Name "IsInstalled" -Value 0 -Force
+   Set-ItemProperty -Path $UserKey -Name "IsInstalled" -Value 0 -Force
+   Stop-Process -Name Explorer -Force
+   Write-Host "IE Enhanced Security Configuration (ESC) has been disabled." -ForegroundColor Green
+}
+
+function Disable-UserAccessControl {
+   Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "ConsentPromptBehaviorAdmin" -Value 00000000 -Force
+   Write-Host "User Access Control (UAC) has been disabled." -ForegroundColor Green
+}
+Disable-UserAccessControl
+Disable-InternetExplorerESC
+
+netsh advfirewall set allprofiles state off
 
 $ipAddress = (Invoke-RestMethod -Method Get -Uri http://169.254.169.254/latest/meta-data/public-ipv4)
 $route53_zone_id = "${route53_zone_id}"
