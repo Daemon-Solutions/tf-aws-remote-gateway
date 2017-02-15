@@ -10,7 +10,7 @@ resource "aws_security_group_rule" "rdp" {
   from_port = "3389"
   to_port = "3389"
   security_group_id = "${aws_security_group.rdgw_external.id}"
-  cidr_blocks = "0.0.0.0/0"
+  cidr_blocks = ["${data.aws_vpc.cidr.cidr_block}"]
 }
 
 resource "aws_security_group_rule" "443" {
