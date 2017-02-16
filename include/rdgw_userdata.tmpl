@@ -1,6 +1,3 @@
-$ssm_param_domain_pw = ${ssm_param_domain_pw}
-$domain_password = (Get-SSMParameterValue -Name $ssm_param_domain_pw -WithDecryption $true).Parameters.value
-
 function ConnectToDomain() {
 	$domain = (Get-WmiObject -Class Win32_ComputerSystem).Domain
 	$newDomain = "${domain_name}"
