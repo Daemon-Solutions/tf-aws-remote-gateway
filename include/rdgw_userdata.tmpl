@@ -1,8 +1,11 @@
+$ssm_param_domain_pw = ${ssm_param_domain_pw}
+$domain_password = (Get-SSMParameterValue -Name $ssm_param_domain_pw -WithDecryption $true).Parameters.value
+
 function ConnectToDomain() {
 	$domain = (Get-WmiObject -Class Win32_ComputerSystem).Domain
 	$newDomain = "${domain_name}"
 	$ad_user = "${ad_user}"
-	$newDomainPassword = '${domain_password}' # single quotes because password can contain dollar sign
+	$newDomainPassword = '$domain_password' # single quotes because password can contain dollar sign
 	if ( ([string]::Compare($newDomain, $domain, $True) -ne 0) ) {
 	  $connect = (Get-WmiObject -Class Win32_ComputerSystem).JoinDomainOrWorkGroup($newDomain,$newDomainPassword,"$ad_user@$newDomain",$null,3).ReturnValue
 	  if ($connect -eq 0 ) {
@@ -73,13 +76,13 @@ Import-module -name remotedesktopservices
 
 set-item -Path "RDS:\GatewayServer\SSLCertificate\Thumbprint" $thumb
 
-if ($aduser -eq "admin") {
+if ($ad_user -eq "admin") {
 new-item -Path RDS:\GatewayServer\RAP -Name Defaut-RAP -UserGroups "admins@$domain_name" -ComputerGroupType 2
 new-item -path RDS:\GatewayServer\CAP -Name Default-CAP -UserGroups "admins@$domain_name" -AuthMethod 1
 
 }
 else {
-new-item -Path RDS:\GatewayServer\RAP -Name Defaut-RAP -UserGroups "domain admins@domain_name" -ComputerGroupType 2
+new-item -Path RDS:\GatewayServer\RAP -Name Defaut-RAP -UserGroups "domain admins@$domain_name" -ComputerGroupType 2
 new-item -path RDS:\GatewayServer\CAP -Name Default-CAP -UserGroups "domain admins@$domain_name" -AuthMethod 1
 }
 
