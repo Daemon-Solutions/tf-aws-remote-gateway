@@ -73,9 +73,15 @@ Import-module -name remotedesktopservices
 
 set-item -Path "RDS:\GatewayServer\SSLCertificate\Thumbprint" $thumb
 
-new-item -path RDS:\GatewayServer\CAP -Name Default-CAP -UserGroups "domain admins@$domain_name" -AuthMethod 1
+if ($aduser -eq "admin") {
+new-item -Path RDS:\GatewayServer\RAP -Name Defaut-RAP -UserGroups "admins@$domain_name" -ComputerGroupType 2
+new-item -path RDS:\GatewayServer\CAP -Name Default-CAP -UserGroups "admins@$domain_name" -AuthMethod 1
 
-new-item -Path RDS:\GatewayServer\RAP -Name Default-RAP -UserGroups "domain admins@$domain_name" -ComputerGroupType 2
+}
+else {
+new-item -Path RDS:\GatewayServer\RAP -Name Defaut-RAP -UserGroups "domain admins@domain_name" -ComputerGroupType 2
+new-item -path RDS:\GatewayServer\CAP -Name Default-CAP -UserGroups "domain admins@$domain_name" -AuthMethod 1
+}
 
 iisreset
 
