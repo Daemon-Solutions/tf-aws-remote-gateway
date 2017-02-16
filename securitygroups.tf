@@ -3,6 +3,7 @@ resource "aws_security_group" "rdgw_external" {
   name        = "${var.customer}-${var.envname}-rdgw-external"
   vpc_id      = "${data.aws_subnet.vpc.vpc_id}"
   description = "rdgw security group"
+}
 
 resource "aws_security_group_rule" "rdp" {
   type = "egress"
