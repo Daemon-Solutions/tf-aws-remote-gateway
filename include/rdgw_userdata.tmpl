@@ -73,13 +73,13 @@ Import-module -name remotedesktopservices
 
 set-item -Path "RDS:\GatewayServer\SSLCertificate\Thumbprint" $thumb
 
-if ($aduser -eq "admin") {
+if ($ad_user -eq "admin") {
 new-item -Path RDS:\GatewayServer\RAP -Name Defaut-RAP -UserGroups "admins@$domain_name" -ComputerGroupType 2
 new-item -path RDS:\GatewayServer\CAP -Name Default-CAP -UserGroups "admins@$domain_name" -AuthMethod 1
 
 }
 else {
-new-item -Path RDS:\GatewayServer\RAP -Name Defaut-RAP -UserGroups "domain admins@domain_name" -ComputerGroupType 2
+new-item -Path RDS:\GatewayServer\RAP -Name Defaut-RAP -UserGroups "domain admins@$domain_name" -ComputerGroupType 2
 new-item -path RDS:\GatewayServer\CAP -Name Default-CAP -UserGroups "domain admins@$domain_name" -AuthMethod 1
 }
 

@@ -8,7 +8,7 @@ data "aws_ami" "windows" {
     }
  }
 
- data "aws_vpc" "cidr" {
+data "aws_vpc" "cidr" {
    id = "${data.aws_subnet.vpc.vpc_id}"
  }
 
@@ -16,7 +16,7 @@ data "aws_subnet" "vpc" {
   id = "${element(var.public_subnets,0)}"
 }
 
- data "aws_region" "current" {
+data "aws_region" "current" {
    current = true
 }
 
@@ -36,7 +36,5 @@ data "template_file" "rdgw_userdata" {
     certificate_bucket_id = "${var.certificate_bucket_id}"
     certificate_object_id = "${var.certificate_object_id}"
     ssm_param_value       = "${var.ssm_param_value}"
-
   }
-
 }
