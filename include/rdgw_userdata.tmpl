@@ -70,9 +70,9 @@ if ((get-windowsfeature -name RSAT-RDS-Tools).installstate -eq "Installed") {
     }
 
 Import-module -name remotedesktopservices
-
 set-item -Path "RDS:\GatewayServer\SSLCertificate\Thumbprint" $thumb
 
+$ad_user = "${ad_user}"
 if ($ad_user -eq "admin") {
 new-item -Path RDS:\GatewayServer\RAP -Name Defaut-RAP -UserGroups "admins@$domain_name" -ComputerGroupType 2
 new-item -path RDS:\GatewayServer\CAP -Name Default-CAP -UserGroups "admins@$domain_name" -AuthMethod 1
