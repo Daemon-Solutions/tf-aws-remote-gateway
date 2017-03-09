@@ -84,7 +84,7 @@ variable "key_name" {}
 # - 88.97.72.136/32   -- Bashton Office
 # - 195.8.68.130/32   -- Claranet London Office
 #
-variable "rdgw_ssh_cidrs" {
+variable "allowed_remote_cidrs" {
   default = ["88.97.72.136/32", "54.76.122.23/32", "195.102.251.16/28", "195.8.68.130/32"]
 }
 
