@@ -10,7 +10,7 @@ There are some specific requirements when using this module, these are listed be
 
 - The certificate name must match the domain name, the domain name must be available in r53 as public hosted zone.
 
-- The certificate must be in pfx format, stored in a "certs" directory in the terraform directory.
+- The certificate must be in pfx format, stored in a "certs" directory in the terraform directory.  It is best practice to keep the certs folder local to avoid storing in GIT repository.
 
 - Use an s3 resource to upload the the certificate, you can then reference the bucket and object id's when calling the module.
 
