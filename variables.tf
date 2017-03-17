@@ -18,6 +18,10 @@ variable "private_subnets" {
   default     = []
 }
 
+variable "subnets" {
+  type = "list"
+}
+
 variable "azs" {
   type = "list"
   default = ["eu-west-1a","eu-west-1b","eu-west-1c"]
@@ -91,3 +95,6 @@ variable "certificate_object_id" {}
 variable "ssm_param_value" {
   default = ""
 }
+
+variable "min" {}
+variable "max" {}
