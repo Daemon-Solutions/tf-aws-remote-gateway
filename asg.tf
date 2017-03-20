@@ -14,8 +14,7 @@ module "asg" {
   key_name             = "${var.key_name}"
   security_groups      = ["${aws_security_group.rdgw_external.id}", "${var.ads_sg}"]
   user_data            = "<powershell>${data.template_file.rdgw_userdata.rendered}</powershell><persist>true</persist>"
-  subnets              = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]#"${var.subnets}" #"${var.public_subnets}"
-  #availability_zones   = "${var.azs}"
-  min           = "${length(var.subnets)}"
-  max           = "${length(var.subnets)}"
+  subnets              = "${var.public_subnets}"
+  min                  = "${length(var.subnets)}"
+  max                  = "${length(var.subnets)}"
 }
