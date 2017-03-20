@@ -1,8 +1,7 @@
 ## builds rdp jump servers
 
 module "asg" {
-  #source = "../tf-aws-asg"
-  source = "C:/Users/sdatt/Documents/bashton/bashton-windows/aws/terraform/localmodules/tf-aws-asg"
+  source = "../tf-aws-asg"
 
   name    = "${var.customer}-${var.service}"
   envname = "${var.envname}"
