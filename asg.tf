@@ -3,7 +3,7 @@
 module "asg" {
   source = "../tf-aws-asg"
 
-  name                  = "${var.customer}-${var.envtype}-${var.service}"
+  name                  = "${var.service}-${var.envtype}"
   envname               = "${var.envname}"
   service               = "${var.envtype}"
 
