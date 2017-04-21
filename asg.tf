@@ -15,7 +15,7 @@ module "asg" {
   user_data             = "<powershell>${var.domain_connect_userdata}</powershell><persist>true</persist>"
 
   subnets               = "${var.public_subnets}"
-  availability_zones    = "${var.azs}"
-  asg_min               = "${length(var.azs)}"
-  asg_max               = "${length(var.azs)}"
+  
+  min               = "${length(var.azs)}"
+  max               = "${length(var.azs)}"
 }
