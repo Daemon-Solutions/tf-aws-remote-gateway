@@ -19,11 +19,9 @@ variable "private_subnets" {
 }
 
 variable "azs" {
-  type = "list"
-  default = ["eu-west-1a","eu-west-1b","eu-west-1c"]
+  type    = "list"
+  default = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
 }
-
-variable "domain_name" {}
 
 ## IAM profile
 
@@ -33,22 +31,11 @@ variable "profile" {
 
 # ADS vars
 
-variable "domain_password" {}
-
 variable "ads_dns" {
   type = "list"
 }
 
 variable "ads_sg" {}
-
-variable "admin_users" {
-  default = {
-    "SimpleAD"    = "administrator",
-    "MicrosoftAD" = "admin"
-  }
-}
-
-variable "ad_type" {}
 
 ## Userdata Variables
 
@@ -56,14 +43,12 @@ variable "domain_connect_userdata" {
   default = ""
 }
 
-variable "local_password" {}
-
 # ## Launch Configuration Variables & ami lookup
 
 variable "windows_ami_names" {
   default = {
-    "2008" = "Windows_Server-2008-R2_SP1-English-64Bit-Base-*",
-    "2012" = "Windows_Server-2012-R2_RTM-English-64Bit-Base-*",
+    "2008" = "Windows_Server-2008-R2_SP1-English-64Bit-Base-*"
+    "2012" = "Windows_Server-2012-R2_RTM-English-64Bit-Base-*"
     "2016" = "Windows_Server-2016-English-Full-Base*"
   }
 }
