@@ -31,10 +31,6 @@ variable "profile" {
 
 # ADS vars
 
-variable "ads_dns" {
-  type = "list"
-}
-
 variable "ads_sg" {}
 
 ## Userdata Variables
