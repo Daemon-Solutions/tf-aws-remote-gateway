@@ -20,5 +20,5 @@ resource "aws_security_group_rule" "443" {
   from_port = "443"
   to_port = "443"
   security_group_id = "${aws_security_group.rdgw_external.id}"
-  cidr_blocks = "${var.allowed_remote_cidrs}"
+  cidr_blocks = ["${var.allowed_remote_cidrs}"]
 }
