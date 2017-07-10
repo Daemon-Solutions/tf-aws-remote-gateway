@@ -22,3 +22,12 @@ resource "aws_security_group_rule" "443" {
   security_group_id = "${aws_security_group.rdgw_external.id}"
   cidr_blocks = ["${var.allowed_remote_cidrs}"]
 }
+
+resource "aws_security_group_rule" "443_out" {
+  type = "egress"
+  protocol = "tcp"
+  from_port = "443"
+  to_port = "443"
+  security_group_id = "${aws_security_group.rdgw_external.id}"
+  cidr_blocks = ["0.0.0.0/0"]
+}
