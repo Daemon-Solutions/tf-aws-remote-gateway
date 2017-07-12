@@ -14,6 +14,6 @@ module "asg" {
   security_groups      = ["${aws_security_group.rdgw_external.id}", "${var.ads_sg}"]
   user_data            = "<powershell>${data.template_file.rdgw_userdata.rendered}</powershell><persist>true</persist>"
   subnets              = "${var.public_subnets}"
-  min                  = "${length(var.subnets)}"
-  max                  = "${length(var.subnets)}"
+  min                  = "${var.min}"
+  max                  = "${var.max)}"
 }
