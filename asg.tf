@@ -15,5 +15,5 @@ module "asg" {
   user_data            = "<powershell>${data.template_file.rdgw_userdata.rendered}</powershell><persist>true</persist>"
   subnets              = "${var.public_subnets}"
   min                  = "${var.min}"
-  max                  = "${var.max)}"
+  max                  = "${var.max}"
 }
