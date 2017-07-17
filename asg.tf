@@ -19,7 +19,7 @@ resource "aws_autoscaling_group" "asg" {
   }
 
   tag {
-    key = "Environment Name"
+    key = "EnvironmentName"
 
     value = "${var.envname}"
 
@@ -27,7 +27,7 @@ resource "aws_autoscaling_group" "asg" {
   }
 
   tag {
-    key = "Environment Type"
+    key = "EnvironmentType"
 
     value = "${var.envtype}"
 
