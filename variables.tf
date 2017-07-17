@@ -1,10 +1,10 @@
-variable "customer" {}
+variable "name" {}
 
 variable "envname" {}
 
 variable "envtype" {}
 
-variable "service" {
+variable "profile" {
   default = "rdgw"
 }
 
@@ -13,32 +13,22 @@ variable "public_subnets" {
   default     = []
 }
 
-variable "private_subnets" {
-  description = "A list of private subnets inside the VPC."
-  default     = []
-}
-
 variable "subnets" {
   type = "list"
 }
 
 variable "azs" {
-  type = "list"
-  default = ["eu-west-1a","eu-west-1b","eu-west-1c"]
+  type    = "list"
+  default = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
 }
 
 variable "aws_region" {
   default = "eu-west-1"
 }
+
 variable "domain_name" {}
 
 variable "route53_zone_id" {}
-
-## IAM profile
-
-variable "profile" {
-  default = "rdgw"
-}
 
 # ADS vars
 
@@ -48,11 +38,9 @@ variable "ads_dns" {
   type = "list"
 }
 
-variable "ads_sg" {}
-
 variable "admin_users" {
   default = {
-    "SimpleAD"    = "administrator",
+    "SimpleAD"    = "administrator"
     "MicrosoftAD" = "admin"
   }
 }
@@ -65,8 +53,8 @@ variable "local_password" {}
 
 variable "windows_ami_names" {
   default = {
-    "2008" = "Windows_Server-2008-R2_SP1-English-64Bit-Base-*",
-    "2012" = "Windows_Server-2012-R2_RTM-English-64Bit-Base-*",
+    "2008" = "Windows_Server-2008-R2_SP1-English-64Bit-Base-*"
+    "2012" = "Windows_Server-2012-R2_RTM-English-64Bit-Base-*"
     "2016" = "Windows_Server-2016-English-Full-Base*"
   }
 }
@@ -79,11 +67,40 @@ variable "instance_type" {
   default = "t2.medium"
 }
 
+variable "user_data" {
+  default = ""
+}
+
 variable "key_name" {}
 
 variable "allowed_remote_cidrs" {
-  type = "list"
+  type    = "list"
   default = []
+}
+
+variable "detailed_monitoring" {
+  default = false
+}
+
+variable "associate_public_ip_address" {
+  default = true
+}
+
+variable "security_groups" {
+  type    = "list"
+  default = []
+}
+
+## asg variables
+
+variable "patch_group" {}
+
+variable "health_check_type" {
+  default = "EC2"
+}
+
+variable "health_check_grace_period" {
+  default = 300
 }
 
 ## s3 bucket vars
