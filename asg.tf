@@ -1,19 +1,52 @@
-## builds rdp jump servers
+resource "aws_autoscaling_group" "asg" {
+  name                = "${var.name}-${var.profile}"
+  vpc_zone_identifier = ["${var.subnets}"]
 
-module "asg" {
-  source = "../tf-aws-asg"
+  launch_configuration = "${aws_launch_configuration.lc.name}"
 
-  name    = "${var.customer}-${var.service}"
-  envname = "${var.envname}"
-  service = "${var.envtype}"
+  min_size = "${var.min}"
+  max_size = "${var.max}"
 
-  ami_id               = "${data.aws_ami.windows.id}"
-  instance_type        = "${var.instance_type}"
-  iam_instance_profile = "${module.iam_instance_profile.profile_id}"
-  key_name             = "${var.key_name}"
-  security_groups      = ["${aws_security_group.rdgw_external.id}", "${var.ads_sg}"]
-  user_data            = "<powershell>${data.template_file.rdgw_userdata.rendered}</powershell><persist>true</persist>"
-  subnets              = "${var.public_subnets}"
-  min                  = "${var.min}"
-  max                  = "${var.max}"
+  health_check_grace_period = "${var.health_check_grace_period}"
+  health_check_type         = "${var.health_check_type}"
+
+  tag {
+    key = "Name"
+
+    value = "${var.name}-${var.profile}"
+
+    propagate_at_launch = true
+  }
+
+  tag {
+    key = "Environment Name"
+
+    value = "${var.envname}"
+
+    propagate_at_launch = true
+  }
+
+  tag {
+    key = "Environment Type"
+
+    value = "${var.envname}"
+
+    propagate_at_launch = true
+  }
+
+  tag {
+    key = "Profile"
+
+    value = "${var.profile}"
+
+    propagate_at_launch = true
+  }
+
+  tag {
+    key = "Patch Group"
+
+    value = "${var.patch_group}"
+
+    propagate_at_launch = true
+  }
 }
