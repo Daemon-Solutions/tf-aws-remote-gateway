@@ -29,7 +29,7 @@ resource "aws_autoscaling_group" "asg" {
   tag {
     key = "Environment Type"
 
-    value = "${var.envname}"
+    value = "${var.envtype}"
 
     propagate_at_launch = true
   }
