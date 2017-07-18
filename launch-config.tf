@@ -12,5 +12,5 @@ resource "aws_launch_configuration" "lc" {
   key_name                    = "${var.key_name}"
   associate_public_ip_address = "${var.associate_public_ip_address}"
   enable_monitoring           = "${var.detailed_monitoring}"
-  user_data                   = "${data.template_file.userdata.rendered}${var.user_data}"
+  user_data                   = "<powershell>${data.template_file.userdata.rendered}${var.user_data}</powershell><persist>true</persist>"
 }
