@@ -104,7 +104,7 @@ Disable-InternetExplorerESC
 netsh advfirewall set allprofiles state off
 
 $ipAddress = (Invoke-RestMethod -Method Get -Uri http://169.254.169.254/latest/meta-data/public-ipv4)
-$route53_zone_id = "${route53_zone_id}"
+$route53_zone_id = "${public_r53_domain}"
 $HostName = "$env:COMPUTERNAME.$domain_name"
 $record = new-object Amazon.Route53.Model.ResourceRecord
 $record.Value = $ipAddress

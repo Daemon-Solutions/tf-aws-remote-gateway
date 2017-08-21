@@ -28,7 +28,7 @@ variable "aws_region" {
 
 variable "domain_name" {}
 
-variable "route53_zone_id" {}
+variable "public_r53_domain" {}
 
 # ADS vars
 
@@ -53,7 +53,6 @@ variable "local_password" {}
 
 variable "windows_ami_names" {
   default = {
-    "2008" = "Windows_Server-2008-R2_SP1-English-64Bit-Base-*"
     "2012" = "Windows_Server-2012-R2_RTM-English-64Bit-Base-*"
     "2016" = "Windows_Server-2016-English-Full-Base*"
   }
