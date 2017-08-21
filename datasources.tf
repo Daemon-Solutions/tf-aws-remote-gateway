@@ -31,7 +31,7 @@ data "template_file" "userdata" {
     local_password        = "${var.local_password}"
     domain_password       = "${var.domain_password}"
     domain_name           = "${var.domain_name}"
-    route53_zone_id       = "${var.route53_zone_id}"
+    public_r53_domain     = "${var.public_r53_domain}"
     certificate_bucket_id = "${var.certificate_bucket_id}"
     certificate_object_id = "${var.certificate_object_id}"
     ssm_param_value       = "${var.ssm_param_value}"
