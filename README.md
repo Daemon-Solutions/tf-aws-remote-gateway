@@ -3,6 +3,9 @@ tf-aws-remote-gateway
 
 This module is for creating a secure RD gateway solution.
 
+Once rdgw instances are up and running a self signed cert for each instance will appear in ${var.name}-${var.envname}-cert-bucket".
+Download each certificate and import into your local machine trusted root store.
+
 Usage
 -----
 
