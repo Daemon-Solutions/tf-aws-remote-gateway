@@ -4,7 +4,7 @@ resource "aws_launch_configuration" "lc" {
     create_before_destroy = true
   }
 
-  name_prefix                 = "${var.name}-${var.profile}"
+  name_prefix                 = "${var.profile}"
   security_groups             = ["${aws_security_group.rdgw.id}", "${var.security_groups}"]
   image_id                    = "${data.aws_ami.windows.id}"
   instance_type               = "${var.instance_type}"
