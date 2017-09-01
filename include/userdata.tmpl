@@ -1,3 +1,7 @@
+$route53_zone_id = "${public_r53_domain_id}"
+$route53_zone_name = "${public_r53_domain}".TrimEnd('.')
+$domain_name = "${domain_name}"
+
 function ConnectToDomain() {
 	$domain = (Get-WmiObject -Class Win32_ComputerSystem).Domain
 	$newDomain = "${domain_name}"
@@ -39,51 +43,102 @@ if ( ([string]::Compare($newName, $env:computerName, $True) -ne 0) ) {
 	ConnectToDomain
 }
 
+#Create Cert, install Cert to My, install Cert to Root, Export Cert as pfx
+Function GenerateSelfSignedCert{
+    Param (
+            $certcn,
+            $password,
+            $certfilepath
+           )    
+        
+    #Check if the certificate name was used before
+    $thumbprintA=(dir cert:\localmachine\My -recurse | where {$_.Subject -match "CN=" + $certcn} | Select-Object -Last 1).thumbprint
+    if ($thumbprintA.Length -gt 0)
+    {
+    Write-Host "Cert already exists" -ForegroundColor Cyan
+
+    }
+    else
+    {
+    $thumbprintA=New-SelfSignedCertificate -DnsName $certcn -CertStoreLocation cert:\LocalMachine\My |ForEach-Object{ $_.Thumbprint}
+    }
+            $message = $certcn + " installed into LocalMachine\My successfully with thumprint "+$thumbprintA
+            Write-Host $message -ForegroundColor Cyan
+            Write-Host "Exporting Certificate as .pfx file" -ForegroundColor Cyan
+            certutil -f -exportPFX -p $password my $thumbprintA $certfilepath
+            Write-Host "Importing Certificate to LocalMachine\Root" -ForegroundColor Cyan
+            certutil -f -p $password -importpfx $certfilepath
+            Write-Host "Import successful." -ForegroundColor Cyan
+ }
+
+ function Set-RdsGwCertificate {
+    [cmdletbinding(DefaultParameterSetName='Thumbprint')]
+    param (
+        [Parameter(Mandatory, ParameterSetName='CertHash', ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [byte[]]$CertHash,
+        
+        [Parameter(Mandatory, ParameterSetName='Thumbprint', ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [ValidateNotNullOrEmpty()]
+        [String] $Thumbprint
+    )
+    process {
+        if ($PSCmdlet.ParameterSetName -eq 'Thumbprint') {
+            if ($Cert = Get-Item -Path  Cert:\LocalMachine\My\$Thumbprint -ErrorAction SilentlyContinue) {
+                $CertHash = $Cert.GetCertHash()
+            } else {
+                throw ('Certificate matching thumbprint {0} was not found' -f $Thumbprint)
+            }
+        }
+        
+        #remove current SSL configuration if exists and restart
+        if (Get-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\HTTP\Parameters\SslBindingInfo\0.0.0.0:443 -Name SslCertHash -ErrorAction SilentlyContinue) {
+            Remove-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\HTTP\Parameters\SslBindingInfo\0.0.0.0:443 -Name SslCertHash
+            Restart-Service -Name TSGateway -Force
+        }
+        
+        $SSLConfigure = Get-CimInstance -Namespace root/CIMV2/TerminalServices -ClassName Win32_TSGatewayServerSettings | 
+            Invoke-CimMethod -MethodName SetCertificate -Arguments @{CertHash = $CertHash}
+        if ($SSLConfigure.ReturnValue -ne 0) {
+            throw ('Failed assigning generated Certificate. Returnvalue: {0}' -f $SSLConfigure.ReturnValue)
+        }
+        $SSLACLConfigure = Get-CimInstance -Namespace root/CIMV2/TerminalServices -ClassName Win32_TSGatewayServerSettings | 
+            Invoke-CimMethod -MethodName SetCertificateACL -Arguments @{CertHash = $CertHash}
+        if ($SSLACLConfigure.ReturnValue -ne 0) {
+            throw ('Failed assigning ACL to generated Certificate. Returnvalue: {0}' -f $SSLACLConfigure.ReturnValue)
+        }
+        $SSLContextConfigure = Get-CimInstance -Namespace root/CIMV2/TerminalServices -ClassName Win32_TSGatewayServerSettings | 
+            Invoke-CimMethod -MethodName RefreshCertContext -Arguments @{CertHash = $CertHash}
+        if ($SSLContextConfigure.ReturnValue -ne 0) {
+            throw ('Failed refreshing context for generated Certificate. Returnvalue: {0}' -f $SSLContextConfigure.ReturnValue)
+        }
+    }
+}
+
+function win-features {
+[string[]]$features = @("rds-gateway","rsat-rds-tools")
+if ((get-windowsfeature -name $features).installstate -eq "Installed") {
+  write-host "Roles already installed"
+}
+else { install-windowsfeature $features -IncludeManagementtools -IncludeAllSubFeature}
+}
+
+function rapcap-policies {
+Import-module -name remotedesktopservices
+$ad_user = "${ad_user}"
 $domain_name = "${domain_name}"
-
-$bucketname = "${certificate_bucket_id}"
-$bucketobject = "${certificate_object_id}"
-$ssmparam	= "${ssm_param_value}"
-
-$certificate_password = (Get-SSMParameterValue -Name $ssmparam -WithDecryption $true).Parameters.value
-
-$certstore = "c:\cert.pfx"
-copy-S3Object -BucketName $bucketname -Key $bucketobject -LocalFile $certstore
-
-$certpwd = ConvertTo-SecureString $certificate_password -AsPlainText -Force
-Import-PfxCertificate -CertStoreLocation Cert:\LocalMachine\my -Password $certpwd -FilePath $certstore
-
-$thumb = (gci -path cert:/LocalMachine/My | select -first 1).Thumbprint
-
-if ((get-windowsfeature -name rds-gateway).installstate -eq "Installed") {
-  write-host "Role already installed"}
-  else {
-    Add-windowsfeature -Name RDS-gateway -IncludeManagementtools –IncludeAllSubFeature
-  }
-
-if ((get-windowsfeature -name RSAT-RDS-Tools).installstate -eq "Installed") {
-    write-host "Role already installed"}
-    else {
-      Add-windowsfeature -Name RSAT-RDS-Tools
-		  sleep -seconds 30
-      restart-computer
+$rappolicy = "defaultrap"
+$cappolicy = "defaultcap"
+if ($ad_user -eq "admin") {
+    if (-not(test-path "RDS:\GatewayServer\RAP\$rappolicy")){new-item -Path RDS:\GatewayServer\RAP -Name $rappolicy -UserGroups "admins@$domain_name" -ComputerGroupType 2}
+    if (-not(test-path "RDS:\GatewayServer\CAP\$cappolicy")){new-item -path RDS:\GatewayServer\CAP -Name $cappolicy -UserGroups "admins@$domain_name" -AuthMethod 1}
     }
 
-Import-module -name remotedesktopservices
-set-item -Path "RDS:\GatewayServer\SSLCertificate\Thumbprint" $thumb
 
-$ad_user = "${ad_user}"
-if ($ad_user -eq "admin") {
-new-item -Path RDS:\GatewayServer\RAP -Name Defaut-RAP -UserGroups "admins@$domain_name" -ComputerGroupType 2
-new-item -path RDS:\GatewayServer\CAP -Name Default-CAP -UserGroups "admins@$domain_name" -AuthMethod 1
-
-}
 else {
-new-item -Path RDS:\GatewayServer\RAP -Name Defaut-RAP -UserGroups "domain admins@$domain_name" -ComputerGroupType 2
-new-item -path RDS:\GatewayServer\CAP -Name Default-CAP -UserGroups "domain admins@$domain_name" -AuthMethod 1
+      if (-not(test-path "RDS:\GatewayServer\RAP\$rappolicy")){new-item -Path RDS:\GatewayServer\RAP -Name $rappolicy -UserGroups "domain admins@$domain_name" -ComputerGroupType 2}
+      if (-not(test-path "RDS:\GatewayServer\CAP\$cappolicy")){new-item -path RDS:\GatewayServer\CAP -Name $cappolicy -UserGroups "domain admins@$domain_name" -AuthMethod 1}
+    }
 }
-
-iisreset
 
 function Disable-InternetExplorerESC {
    $AdminKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"
@@ -98,14 +153,14 @@ function Disable-UserAccessControl {
    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "ConsentPromptBehaviorAdmin" -Value 00000000 -Force
    Write-Host "User Access Control (UAC) has been disabled." -ForegroundColor Green
 }
-Disable-UserAccessControl
-Disable-InternetExplorerESC
 
 netsh advfirewall set allprofiles state off
 
+function r53-record-update {
+$route53_zone_id = "${public_r53_domain_id}"
+$route53_zone_name = "${public_r53_domain}".TrimEnd('.')
 $ipAddress = (Invoke-RestMethod -Method Get -Uri http://169.254.169.254/latest/meta-data/public-ipv4)
-$route53_zone_id = "${public_r53_domain}"
-$HostName = "$env:COMPUTERNAME.$domain_name"
+$HostName = "$env:COMPUTERNAME.$route53_zone_name"
 $record = new-object Amazon.Route53.Model.ResourceRecord
 $record.Value = $ipAddress
 
@@ -120,3 +175,16 @@ $change.Action = 'UPSERT'
 $change.ResourceRecordSet = $rs
 
 Edit-R53ResourceRecordSet -HostedZoneId $route53_zone_id -ChangeBatch_Change $change
+}
+
+$certlocation = "c:\$env:COMPUTERNAME-cert.pfx"
+GenerateSelfSignedCert -certcn "$env:COMPUTERNAME.$route53_zone_name" -password "${pfx_pw}" -certfilepath $certlocation
+Write-S3Object -BucketName "${certificate_bucket_id}" -Key "$env:COMPUTERNAME-$domain_name-cert.pfx" -File $certlocation -Force
+win-features
+$thumb = (Get-ChildItem Cert:\localmachine\My | Where-Object subject -like *"$env:COMPUTERNAME.$route53_zone_name"*).Thumbprint
+Set-RdsGwCertificate -Thumbprint $thumb
+rapcap-policies
+Disable-UserAccessControl
+Disable-InternetExplorerESC
+r53-record-update
+
