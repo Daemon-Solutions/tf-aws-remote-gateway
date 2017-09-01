@@ -40,34 +40,32 @@ module "rdgw" {
 Variables
 ---------
 
-- `customer` - name of customer
-- `envtype`  - name of environment type
-- `envname`  - name of environment
-
-- `domain_name`           - name of ads domain
-- `domain_password`       - domain password for joining domain
-- `local_password`        - local password for rdgw instances
-- `public_subnets`        - public subnets for rdgw instances
-- `ads_dns`               - [list of ads dns servers]
-- `ads_sg`                - id of ads security group
-- `key_name`              - keypair name
-- `ad_type`               - type of ads MicrosoftAD or SimpleAD
-- `route53_zone_id`       - r53 zone id of the domain
-- `certificate_bucket_id` - bucket id where cert is stored
-- `certificate_object_id` - id of cert object in s3 bucket
-- `ssm_param_value`       - name of ssm parameter where encrypted cert password is stored
-
-Optional Variables
-------------------
-
-- `aws_region`            - defaults to eu-west-1
-- `profile`               - instance profile name defaults to rdgw
-- `rdgw_ssh_cidrs`        - list of allowed rdgw cidr blocks defaults to
-
-`["88.97.72.136/32", "54.76.122.23/32", "195.102.251.16/28", "195.8.68.130/32"]`
-
-- `instance_type`         - defaults to t2.medium
-
+- `name`                        - name of customer `(Required)`
+- `envname`                     - name of environment `(Required)`
+- `profile`                     - defaults to `rdgw` `(Optional)`
+- `subnets`                     - list of subnets where the rdgw instances are required, these will need to be public subnets `(Required)`
+- `aws_region`                  - default is eu-west-1 `(Optional)`
+- `azs`                         - list of az's, defaults are "eu-west-1a", "eu-west-1b", "eu-west-1c" `(Optional)`
+- `public_r53_domain`           - the public r53 domain the rdgw A records will be present in `(Required)`
+- `public_r53_domain_id`        - the public r53 zone id the rdgw A records will be present in `(Required)`
+- `ad_domain_name`              - name of ads domain `(Required)`
+- `ad_domain_password`          - domain password for joining domain `(Required)`
+- `local_password`              - local password for rdgw instances `(Required)`
+- `ads_dns`                     - [list of ads dns servers] `(Required)`
+- `ads_sg`                      - id of ads security group `(Required)`
+- `key_name`                    - keypair name `(Required)`
+- `ad_type`                     - type of ads MicrosoftAD, SimpleAD or EC2AD `(Required)`
+- `certificate_password`        - password for self signed certificate `(Required)`
+- `user_data`                   - any additional user data required - defaults to nothing `(Optional)`
+- `allowed_remote_cidrs`        - list of cidr blocks you wish to be able to access the rdgw instances `(Optional)`
+- `detailed_monitoring`         - launch config detailed monitoring - defaults to false `(Optional)`
+- `associate_public_ip_address` - defaults to true `(Optional)`
+- `security_groups`             - list of security groups you wish to have associated to the rdgw instances, defaults is empty  `(Optional)`
+- `min`                         - minimum number of rdgw instances you require `(Required)`
+- `max`                         - maximum number of rdgw instances you require `(Required)`
+- `patch_group`                 - the ssm patch group you want the rdgw instances associated with, default is automatic `(Optional)`
+- `health_check_type`           - defaults to EC2 as there is no ELB/ALB `(Optional)`
+- `health_check_grace_period`   - defaults to 300 seconds `(Optional)`
 
 Outputs
 -------
