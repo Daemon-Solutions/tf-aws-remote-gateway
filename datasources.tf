@@ -14,7 +14,7 @@ data "aws_vpc" "cidr" {
 }
 
 data "aws_subnet" "vpc" {
-  id = "${element(var.public_subnets,0)}"
+  id = "${element(var.subnets,0)}"
 }
 
 data "aws_region" "current" {
@@ -29,11 +29,11 @@ data "template_file" "userdata" {
     ad_user               = "${lookup(var.admin_users,var.ad_type)}"
     dns_servers           = "${element(var.ads_dns,0)},${element(var.ads_dns,1)}"
     local_password        = "${var.local_password}"
-    domain_password       = "${var.domain_password}"
-    domain_name           = "${var.domain_name}"
+    domain_password       = "${var.ad_domain_password}"
+    domain_name           = "${var.ad_domain_name}"
     public_r53_domain     = "${var.public_r53_domain}"
-    certificate_bucket_id = "${var.certificate_bucket_id}"
-    certificate_object_id = "${var.certificate_object_id}"
-    ssm_param_value       = "${var.ssm_param_value}"
+    public_r53_domain_id  = "${var.public_r53_domain_id}"
+    certificate_bucket_id = "${aws_s3_bucket.certificate_bucket.id}"
+    pfx_pw                = "${var.certificate_password}"
   }
 }
