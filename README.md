@@ -3,19 +3,6 @@ tf-aws-remote-gateway
 
 This module is for creating a secure RD gateway solution.
 
-Prerequisites
--------------
-
-There are some specific requirements when using this module, these are listed below;
-
-- The certificate name must match the domain name, the domain name must be available in r53 as public hosted zone.
-
-- The certificate must be in pfx format, stored in a "certs" directory in the terraform directory.  It is best practice to keep the certs folder local to avoid storing in GIT repository.
-
-- Use an s3 resource to upload the the certificate, you can then reference the bucket and object id's when calling the module.
-
-- Manually create an SSM parameter of a secure string, this secure string should contain the password for the pfx file, you can then pass the name of this SSM parameter into the rdgw module.
-
 Usage
 -----
 
@@ -25,24 +12,28 @@ Declare a module in your Terraform file, for example:
 
 ```js
 module "rdgw" {
-  source = "../modules/tf-aws-remote-gateway"
+  source  = "../modules/tf-aws-remote-gateway"
+  name    = "remote-gateway"
+  envname = "${var.envname}"
 
-  customer = "${var.customer}"
-  envtype  = "${var.envtype}"
-  envname  = "${var.envname}"
-
-  domain_name           = "${var.domain_name}"
-  domain_password       = "${var.domain_password}"
-  local_password        = "${var.local_password}"
-  public_subnets        = "${module.vpc.public_subnets}"
-  ads_dns               = ["${module.ads.ads_dns}"]
-  ads_sg                = "${module.ads.ads_sg_id}"
-  key_name              = "${var.key_name}"
-  ad_type               = "${var.ad_type}"
-  route53_zone_id       = "${aws_route53_zone.domain.id}"
-  certificate_bucket_id = "${aws_s3_bucket.certificate_bucket.id}"
-  certificate_object_id = "${aws_s3_bucket_object.certificate.id}"
-  ssm_param_value       = "${var.ssm_param_value}"
+  ad_domain_name     = "${var.domain_name}"
+  ad_domain_password = "${var.domain_password}"
+  local_password     = "${var.local_password}"
+  ads_dns              = ["${module.ads.ads_dns}"]
+  security_groups      = ["${module.ads.ads_sg_id}"]
+  key_name             = "${var.key_name}"
+  ad_type              = "${var.ad_type}"
+  aws_region           = "${var.aws_region}"
+  public_r53_domain    = "${data.aws_route53_zone.public_domain.name}"
+  public_r53_domain_id = "${data.aws_route53_zone.public_domain.id}"
+  patch_group          = "automatic"
+  path_to_cert         = "../certs/team-bowser.com.pfx"
+  certificate_password = "pleasehelp"
+  allowed_remote_cidrs = ["${data.terraform_remote_state.vpc.allowed_remote_cidrs}"]
+  subnets              = "${data.terraform_remote_state.vpc.public_subnets}"
+  min                  = "${length(data.terraform_remote_state.vpc.public_subnets)}"
+  max                  = "${length(data.terraform_remote_state.vpc.public_subnets)}"
+  user_data            = "${data.template_file.puppet.rendered}"
 }
 ```
 
