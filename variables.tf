@@ -2,16 +2,11 @@ variable "name" {}
 
 variable "envname" {}
 
-variable "envtype" {}
-
 variable "profile" {
   default = "rdgw"
 }
 
-variable "public_subnets" {
-  description = "A list of public subnets inside the VPC."
-  default     = []
-}
+## VPC vars
 
 variable "subnets" {
   type = "list"
@@ -26,13 +21,15 @@ variable "aws_region" {
   default = "eu-west-1"
 }
 
-variable "domain_name" {}
-
 variable "public_r53_domain" {}
+
+variable "public_r53_domain_id" {}
 
 # ADS vars
 
-variable "domain_password" {}
+variable "ad_domain_name" {}
+
+variable "ad_domain_password" {}
 
 variable "ads_dns" {
   type = "list"
@@ -42,6 +39,7 @@ variable "admin_users" {
   default = {
     "SimpleAD"    = "administrator"
     "MicrosoftAD" = "admin"
+    "EC2AD"       = "administrator"
   }
 }
 
@@ -92,7 +90,13 @@ variable "security_groups" {
 
 ## asg variables
 
-variable "patch_group" {}
+variable "min" {}
+
+variable "max" {}
+
+variable "patch_group" {
+  default = "automatic"
+}
 
 variable "health_check_type" {
   default = "EC2"
@@ -102,15 +106,6 @@ variable "health_check_grace_period" {
   default = 300
 }
 
-## s3 bucket vars
+## rdgw vars
 
-variable "certificate_bucket_id" {}
-
-variable "certificate_object_id" {}
-
-variable "ssm_param_value" {
-  default = ""
-}
-
-variable "min" {}
-variable "max" {}
+variable "certificate_password" {}
