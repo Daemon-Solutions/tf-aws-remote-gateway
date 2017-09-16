@@ -10,7 +10,7 @@ variable "profile" {
   default = "rdgw"
 }
 
-variable "name_overide" {
+variable "name_override" {
   default = ""
 }
 

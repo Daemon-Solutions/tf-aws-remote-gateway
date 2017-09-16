@@ -15,13 +15,18 @@ Declare a module in your Terraform file, for example:
 
 ```js
 module "rdgw" {
-  source  = "../modules/tf-aws-remote-gateway"
-  name    = "remote-gateway"
-  envname = "${var.envname}"
+  source = "../modules/tf-aws-remote-gateway"
 
-  ad_domain_name     = "${var.domain_name}"
-  ad_domain_password = "${var.domain_password}"
-  local_password     = "${var.local_password}"
+  name_override = ""
+  resource_tags = "${var.resource_tags}"
+
+  envname  = "${var.envname}"
+  envtype  = "${var.envtype}"
+  customer = "${var.customer}"
+
+  ad_domain_name       = "${var.domain_name}"
+  ad_domain_password   = "${var.domain_password}"
+  local_password       = "${var.local_password}"
   ads_dns              = ["${module.ads.ads_dns}"]
   security_groups      = ["${module.ads.ads_sg_id}"]
   key_name             = "${var.key_name}"
@@ -30,13 +35,17 @@ module "rdgw" {
   public_r53_domain    = "${data.aws_route53_zone.public_domain.name}"
   public_r53_domain_id = "${data.aws_route53_zone.public_domain.id}"
   patch_group          = "automatic"
-  path_to_cert         = "../certs/team-bowser.com.pfx"
   certificate_password = "pleasehelp"
   allowed_remote_cidrs = ["${data.terraform_remote_state.vpc.allowed_remote_cidrs}"]
   subnets              = "${data.terraform_remote_state.vpc.public_subnets}"
   min                  = "${length(data.terraform_remote_state.vpc.public_subnets)}"
   max                  = "${length(data.terraform_remote_state.vpc.public_subnets)}"
-  user_data            = "${data.template_file.puppet.rendered}"
+  user_data            = "${data.template_file.domain_connect_userdata.rendered}"
+  windows_ver          = "2012"
+
+  windows_ami_names = {
+    "2012" = "rdgw*"
+  }
 }
 ```
 
@@ -44,6 +53,8 @@ Variables
 ---------
 
 - `name`                        - name of customer `(Required)`
+- `name_override`                - when set, overrides the default name of resources `(Optional)`
+- `resource_tags`               - map of resource tags `(Required - example below)`
 - `envname`                     - name of environment `(Required)`
 - `profile`                     - defaults to `rdgw` `(Optional)`
 - `subnets`                     - list of subnets where the rdgw instances are required, these will need to be public subnets `(Required)`
@@ -78,3 +89,13 @@ Outputs
 - `asg_id`              - id of asg
 - `asg_name`            - name of asg
 - `rdgw_external_sg_id` - id of rdgw sg
+
+Example Tag Map
+---------------
+
+resource_tags = {
+  customer = "claranet"
+  envtype  = "nonprod"
+  envname  = "dev"
+}
+
