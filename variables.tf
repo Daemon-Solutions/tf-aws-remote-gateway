@@ -1,9 +1,21 @@
-variable "name" {}
+#variable "name" {}
 
 variable "envname" {}
 
+variable "envtype" {}
+
+variable "customer" {}
+
 variable "profile" {
   default = "rdgw"
+}
+
+variable "name_overide" {
+  default = ""
+}
+
+variable "resource_tags" {
+  type = "map"
 }
 
 ## VPC vars

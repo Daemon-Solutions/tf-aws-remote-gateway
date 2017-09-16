@@ -1,5 +1,5 @@
 resource "aws_autoscaling_group" "asg" {
-  name                = "${var.envname}-${var.profile}"
+  name                = "${local.name_prefix}"
   vpc_zone_identifier = ["${var.subnets}"]
 
   launch_configuration = "${aws_launch_configuration.lc.name}"
@@ -13,7 +13,7 @@ resource "aws_autoscaling_group" "asg" {
   tag {
     key = "Name"
 
-    value = "${var.envname}-${var.profile}"
+    value = "${local.tag_name}"
 
     propagate_at_launch = true
   }
@@ -21,7 +21,7 @@ resource "aws_autoscaling_group" "asg" {
   tag {
     key = "EnvironmentName"
 
-    value = "${var.envname}"
+    value = "${local.tag_environmentname}"
 
     propagate_at_launch = true
   }
@@ -29,7 +29,7 @@ resource "aws_autoscaling_group" "asg" {
   tag {
     key = "Profile"
 
-    value = "${var.profile}"
+    value = "${local.tag_profile}"
 
     propagate_at_launch = true
   }
