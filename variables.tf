@@ -1,10 +1,4 @@
-#variable "name" {}
-
 variable "envname" {}
-
-variable "envtype" {}
-
-variable "customer" {}
 
 variable "profile" {
   default = "rdgw"
@@ -121,3 +115,5 @@ variable "health_check_grace_period" {
 ## rdgw vars
 
 variable "certificate_password" {}
+
+variable "certificate_bucket_id" {}
