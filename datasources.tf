@@ -33,7 +33,7 @@ data "template_file" "userdata" {
     domain_name           = "${var.ad_domain_name}"
     public_r53_domain     = "${var.public_r53_domain}"
     public_r53_domain_id  = "${var.public_r53_domain_id}"
-    certificate_bucket_id = "${aws_s3_bucket.certificate_bucket.id}"
+    certificate_bucket_id = "${var.certificate_bucket_id}"
     pfx_pw                = "${var.certificate_password}"
   }
 }
