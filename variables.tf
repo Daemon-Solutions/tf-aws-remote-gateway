@@ -12,6 +12,11 @@ variable "resource_tags" {
   type = "map"
 }
 
+variable "custom_resource_tags" {
+  type    = "map"
+  default = {}
+}
+
 ## VPC vars
 
 variable "subnets" {

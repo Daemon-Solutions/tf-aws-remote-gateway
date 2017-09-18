@@ -3,7 +3,8 @@ tf-aws-remote-gateway
 
 This module is for creating a secure RD gateway solution.
 
-Once rdgw instances are up and running a self signed cert for each instance will appear in ${var.name}-${var.envname}-cert-bucket".
+Once rdgw instances are up and running a self signed cert for each instance will appear in bucket name that is passed to the module.
+
 Download each certificate and import into your local machine trusted root store.
 
 Usage
@@ -53,8 +54,9 @@ Variables
 ---------
 
 - `name`                        - name of customer `(Required)`
-- `name_override`                - when set, overrides the default name of resources `(Optional)`
-- `resource_tags`               - map of resource tags `(Required - example below)`
+- `name_override`               - when set, overrides the default name of resources `(Optional)`
+- `resource_tags`               - map of resource tags `(Required - example below. Generates the standard set of resource tags)`
+- `custom_resource_tags`        - map of custom tags `(optional - example below. Can be map of variables of any length)`
 - `envname`                     - name of environment `(Required)`
 - `profile`                     - defaults to `rdgw` `(Optional)`
 - `subnets`                     - list of subnets where the rdgw instances are required, these will need to be public subnets `(Required)`
@@ -93,9 +95,19 @@ Outputs
 Example Tag Map
 ---------------
 
-resource_tags = {
-  customer = "claranet"
-  envtype  = "nonprod"
-  envname  = "dev"
-}
+`resource_tags = {`
+
+`  envname = "dev"`
+
+`}`
+
+`custom_resource_tags = {`
+
+`  "Custom_tag1" = "use_any_value1"`
+
+`  "Custom_tag2" = "use_any_value2"`
+
+`  "Custom_tag3" = "use_any_value3"`
+
+`}`
 

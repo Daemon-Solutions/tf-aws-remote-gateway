@@ -3,12 +3,7 @@ resource "aws_security_group" "rdgw" {
   name        = "rdgw-access"
   vpc_id      = "${data.aws_subnet.vpc.vpc_id}"
   description = "rdgw security group"
-
-  tags {
-    Name            = "${local.tag_name}"
-    EnvironmentName = "${local.tag_environmentname}"
-    Profile         = "${local.tag_profile}"
-  }
+  tags        = "${local.tags}"
 }
 
 resource "aws_security_group_rule" "rdp_egress" {
