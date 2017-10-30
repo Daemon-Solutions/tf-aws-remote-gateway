@@ -17,6 +17,10 @@ output "asg_name" {
   value = "${aws_autoscaling_group.asg.asg_name}"
 }
 
+output "asg_arn" {
+  value = "${aws_autoscaling_group.asg.asg_arn}"
+}
+
 ## Security Group Outputs
 output "rdgw_sg_id" {
   value = "${aws_security_group.rdgw.id}"
