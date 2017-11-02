@@ -157,6 +157,7 @@ function Disable-UserAccessControl {
 netsh advfirewall set allprofiles state off
 
 function r53-record-update {
+Import-Module AWSPowerShell
 $route53_zone_id = "${public_r53_domain_id}"
 $route53_zone_name = "${public_r53_domain}".TrimEnd('.')
 $ipAddress = (Invoke-RestMethod -Method Get -Uri http://169.254.169.254/latest/meta-data/public-ipv4)
