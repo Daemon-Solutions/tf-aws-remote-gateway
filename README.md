@@ -7,6 +7,8 @@ Once rdgw instances are up and running a self signed cert for each instance will
 
 Download each certificate and import into your local machine trusted root store.
 
+Non-admin users can be allowed remote access by adding them to the `RDGWAccess` group
+
 Usage
 -----
 
