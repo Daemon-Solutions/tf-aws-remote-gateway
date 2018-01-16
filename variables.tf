@@ -54,7 +54,10 @@ variable "admin_users" {
   }
 }
 
-variable "ad_type" {}
+variable "ad_type" {
+  type = "string"
+  default = "SimpleAD"
+}
 
 variable "local_password" {}
 

@@ -1,11 +1,11 @@
 ## IAM Outputs
 output "rdgw_iam_profile_id" {
-  value = "${aws_iam_instance_profile.instance_profile.profile_id}"
+  value = "${aws_iam_instance_profile.instance_profile.id}"
 }
 
 ## Launch Config Outputs
 output "launch_config_id" {
-  value = "${aws_launch_configuration.lc.launch_config_id}"
+  value = "${aws_launch_configuration.lc.id}"
 }
 
 ## Autoscaling Group Outputs
