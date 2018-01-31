@@ -16,4 +16,5 @@ module "asg" {
   subnets                     = "${var.public_subnets}"
   min                         = "${length(var.azs)}"
   max                         = "${length(var.azs)}"
+  patch_group                 = "${var.patch_group}"
 }
