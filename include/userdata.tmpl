@@ -180,7 +180,7 @@ Edit-R53ResourceRecordSet -HostedZoneId $route53_zone_id -ChangeBatch_Change $ch
 }
 
 $certlocation = "c:\$env:COMPUTERNAME-cert.pfx"
-GenerateSelfSignedCert -certcn "$env:COMPUTERNAME.$route53_zone_name" -password "${pfx_pw}" -certfilepath $certlocation
+GenerateSelfSignedCert -certcn "$env:COMPUTERNAME.$route53_zone_name" -password '${pfx_pw}' -certfilepath $certlocation
 Write-S3Object -BucketName "${certificate_bucket_id}" -Key "$env:COMPUTERNAME-$domain_name-cert.pfx" -File $certlocation -Force
 win-features
 $thumb = (Get-ChildItem Cert:\localmachine\My | Where-Object subject -like *"$env:COMPUTERNAME.$route53_zone_name"*).Thumbprint
