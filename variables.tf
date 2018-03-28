@@ -55,7 +55,7 @@ variable "admin_users" {
 }
 
 variable "ad_type" {
-  type = "string"
+  type    = "string"
   default = "SimpleAD"
 }
 
@@ -82,7 +82,10 @@ variable "user_data" {
   default = ""
 }
 
-variable "key_name" {}
+variable "key_name" {
+  type    = "string"
+  default = ""
+}
 
 variable "allowed_remote_cidrs" {
   type    = "list"
