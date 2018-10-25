@@ -45,6 +45,7 @@ module "rdgw" {
   max                  = "${length(data.terraform_remote_state.vpc.public_subnets)}"
   user_data            = "${data.template_file.domain_connect_userdata.rendered}"
   windows_ver          = "2012"
+  enable_static_cert    = "${var.enable_static_cert}"
 
   windows_ami_names = {
     "2012" = "rdgw*"
@@ -84,6 +85,7 @@ Variables
 - `patch_group`                 - the ssm patch group you want the rdgw instances associated with, default is automatic `(Optional)`
 - `health_check_type`           - defaults to EC2 as there is no ELB/ALB `(Optional)`
 - `health_check_grace_period`   - defaults to 300 seconds `(Optional)`
+- `enable_static_cert`          - whether to re-use the existing cert if it exists after initial creation. `(Optional. Defaults to false)`
 
 Outputs
 -------

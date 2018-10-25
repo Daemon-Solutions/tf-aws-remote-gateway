@@ -35,5 +35,6 @@ data "template_file" "userdata" {
     public_r53_domain_id  = "${var.public_r53_domain_id}"
     certificate_bucket_id = "${var.certificate_bucket_id}"
     pfx_pw                = "${var.certificate_password}"
+    enable_static_cert    = "${var.enable_static_cert}"
   }
 }

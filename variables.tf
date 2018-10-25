@@ -128,3 +128,8 @@ variable "health_check_grace_period" {
 variable "certificate_password" {}
 
 variable "certificate_bucket_id" {}
+
+variable "enable_static_cert" {
+  type    = "string"
+  default = "false"
+}
