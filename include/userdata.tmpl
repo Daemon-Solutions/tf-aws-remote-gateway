@@ -1,6 +1,7 @@
 $route53_zone_id = "${public_r53_domain_id}"
 $route53_zone_name = "${public_r53_domain}".TrimEnd('.')
 $domain_name = "${domain_name}"
+$staticrdgwcert = "${enable_static_cert}" 
 
 function ConnectToDomain() {
 	$domain = (Get-WmiObject -Class Win32_ComputerSystem).Domain
@@ -181,23 +182,29 @@ Edit-R53ResourceRecordSet -HostedZoneId $route53_zone_id -ChangeBatch_Change $ch
 
 $certlocation = "c:\$env:COMPUTERNAME-cert.pfx"
 
-if (Get-S3Object -BucketName ${certificate_bucket_id} -Key "$env:COMPUTERNAME-$domain_name-cert.pfx") {
-    try {
-        Copy-S3Object -BucketName ${certificate_bucket_id} -Key "$env:COMPUTERNAME-$domain_name-cert.pfx" -LocalFile $certlocation -Force
-        certutil -f -p "${pfx_pw}" -importpfx $certlocation
+if ($staticrdgwcert = "true") {
+    if (Get-S3Object -BucketName ${certificate_bucket_id} -Key "$env:COMPUTERNAME-$domain_name-cert.pfx") {
+        try {
+            Copy-S3Object -BucketName ${certificate_bucket_id} -Key "$env:COMPUTERNAME-$domain_name-cert.pfx" -LocalFile $certlocation -Force
+            certutil -f -p "${pfx_pw}" -importpfx $certlocation
+        }
+        catch {
+            $_.Exception.Message
+        }
     }
-    catch {
-        $_.Exception.Message
+    else {
+        try {
+            GenerateSelfSignedCert -certcn "$env:COMPUTERNAME.$route53_zone_name" -password "${pfx_pw}" -certfilepath $certlocation
+            Write-S3Object -BucketName "${certificate_bucket_id}" -Key "$env:COMPUTERNAME-$domain_name-cert.pfx" -File $certlocation -Force
+        }
+        catch {
+            $_.Exception.Message
+        }
     }
 }
 else {
-    try {
-        GenerateSelfSignedCert -certcn "$env:COMPUTERNAME.$route53_zone_name" -password "${pfx_pw}" -certfilepath $certlocation
-        Write-S3Object -BucketName "${certificate_bucket_id}" -Key "$env:COMPUTERNAME-$domain_name-cert.pfx" -File $certlocation -Force
-    }
-    catch {
-        $_.Exception.Message
-    }
+    GenerateSelfSignedCert -certcn "$env:COMPUTERNAME.$route53_zone_name" -password "${pfx_pw}" -certfilepath $certlocation
+    Write-S3Object -BucketName "${certificate_bucket_id}" -Key "$env:COMPUTERNAME-$domain_name-cert.pfx" -File $certlocation -Force
 }
 win-features
 $thumb = (Get-ChildItem Cert:\localmachine\My | Where-Object subject -like *"$env:COMPUTERNAME.$route53_zone_name"*).Thumbprint
