@@ -183,10 +183,10 @@ Edit-R53ResourceRecordSet -HostedZoneId $route53_zone_id -ChangeBatch_Change $ch
 $certlocation = "c:\$env:COMPUTERNAME-cert.pfx"
 
 if ($staticrdgwcert -eq "true") {
-    if (Get-S3Object -BucketName ${certificate_bucket_id} -Key "$env:COMPUTERNAME-$domain_name-cert.pfx") {
+    if (Get-S3Object -BucketName "${certificate_bucket_id}" -Key "$env:COMPUTERNAME-$domain_name-cert.pfx") {
         try {
-            Copy-S3Object -BucketName ${certificate_bucket_id} -Key "$env:COMPUTERNAME-$domain_name-cert.pfx" -LocalFile $certlocation -Force
-            certutil -f -p "${pfx_pw}" -importpfx $certlocation
+            Copy-S3Object -BucketName "${certificate_bucket_id}" -Key "$env:COMPUTERNAME-$domain_name-cert.pfx" -LocalFile $certlocation -Force
+            certutil -f -p '${pfx_pw}' -importpfx $certlocation
         }
         catch {
             $_.Exception.Message
@@ -194,7 +194,7 @@ if ($staticrdgwcert -eq "true") {
     }
     else {
         try {
-            GenerateSelfSignedCert -certcn "$env:COMPUTERNAME.$route53_zone_name" -password "${pfx_pw}" -certfilepath $certlocation
+            GenerateSelfSignedCert -certcn "$env:COMPUTERNAME.$route53_zone_name" -password '${pfx_pw}' -certfilepath $certlocation
             Write-S3Object -BucketName "${certificate_bucket_id}" -Key "$env:COMPUTERNAME-$domain_name-cert.pfx" -File $certlocation -Force
         }
         catch {
@@ -203,7 +203,7 @@ if ($staticrdgwcert -eq "true") {
     }
 }
 else {
-    GenerateSelfSignedCert -certcn "$env:COMPUTERNAME.$route53_zone_name" -password "${pfx_pw}" -certfilepath $certlocation
+    GenerateSelfSignedCert -certcn "$env:COMPUTERNAME.$route53_zone_name" -password '${pfx_pw}' -certfilepath $certlocation
     Write-S3Object -BucketName "${certificate_bucket_id}" -Key "$env:COMPUTERNAME-$domain_name-cert.pfx" -File $certlocation -Force
 }
 win-features
