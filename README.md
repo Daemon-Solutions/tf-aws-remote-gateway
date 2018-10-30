@@ -1,3 +1,5 @@
+DEPRECATED - 30/10/2018
+
 tf-aws-remote-gateway
 ========================
 
